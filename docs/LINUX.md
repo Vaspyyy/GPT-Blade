@@ -14,7 +14,7 @@ The launcher selects native Wayland when a Wayland session is detected, includin
 
 ## Requirements
 
-- x86_64 Linux with glibc 2.28 or newer; current Debian, Ubuntu, Fedora, Arch, and openSUSE satisfy this baseline.
+- x86_64 Linux, kernel 5.15 or newer, with glibc 2.28 or newer; current Debian, Ubuntu, Fedora, Arch, and openSUSE satisfy this baseline.
 - A working Wayland desktop and OpenGL 3.3 / OpenGL ES 3.0 graphics driver. The game uses Godot's compatibility renderer. Mesa software rendering is usable for diagnostic tests.
 - Normal desktop runtime libraries, including libwayland-client, libxkbcommon, libEGL/libGL, libc, and libstdc++. PulseAudio/PipeWire or ALSA provides sound.
 - A mouse and keyboard; 1280×800 or larger is recommended. The window can be resized.
@@ -23,7 +23,14 @@ The native executable contains the game data. It does not download anything or r
 
 ## Controls and save files
 
-Use the mouse to browse and equip parts, select rivals, and set the launch. Follow the on-screen launch instructions. The battle runs autonomously after launch. Space advances launch timing, Escape opens pause/navigation, and the on-screen buttons provide the same actions. See the game README for the complete control list.
+Use the mouse to browse and equip parts, select rivals, and set the launch. The battle runs autonomously after launch.
+
+| Screen | Controls |
+| --- | --- |
+| Workshop | B: build, C: career, L: Lab, 1–4: part family, Enter: next match, P: practice |
+| Launch | Left/right: entry angle, up/down: tilt. Hold Space to wind; release in the gold power zone. Tap Space again when the snap marker meets the center. |
+| Battle | Space: change battle speed. Escape: pause/resume. |
+| Anywhere | F11: toggle fullscreen. Mouse buttons provide the visible actions. |
 
 Your career is stored in Godot's user-data folder, normally `~/.local/share/godot/app_userdata/SPIN--ASCEND/`. The in-game reset action resets career progress; ordinary losses do not destroy parts.
 
@@ -41,4 +48,4 @@ Run `tools/platform_check.sh /path/to/spin-ascend.x86_64 --smoke` for host diagn
 
 ## Verification scope
 
-The release verification notes in `docs/PLAYTESTS.md` distinguish observed Linux/Wayland results from platform assumptions. The development cloud has no KDE Plasma installation or physical GPU. Native Wayland can be verified on a headless Sway compositor, including rendered screenshots and keyboard/mouse input. This does not establish that KDE-specific scaling, window decorations, or every graphics driver has been tested.
+The bundled `PLAYTESTS.md` (or `docs/PLAYTESTS.md` in the repository) distinguishes observed Linux/Wayland results from platform assumptions. The development cloud has no KDE Plasma installation or physical GPU. Native Wayland was verified on a headless Sway compositor, including rendered screenshots and keyboard/mouse input. This does not establish that KDE-specific scaling, window decorations, or every graphics driver has been tested.

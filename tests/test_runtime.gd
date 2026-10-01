@@ -90,9 +90,15 @@ func run() -> void:
 	await key(KEY_ESCAPE, true)
 	check(not game.paused, "ESC resumes battle")
 	await key(KEY_ESCAPE, false)
+	# A mouse click leaves buttons focused. SPACE must still have exactly one
+	# gameplay meaning, rather than also activating the focused pause button.
+	find_button(game.page, "PAUSE").grab_focus()
 	await key(KEY_SPACE, true)
 	await key(KEY_SPACE, false)
 	check(is_equal_approx(game.speed, 2.0), "SPACE toggles autonomous match speed")
+	check(not game.paused, "SPACE does not also activate a focused pause button")
+	if game.paused:
+		game._toggle_pause()
 	await finish_match()
 	check(game.screen == "results", "automatic battle reaches actual match report screen")
 	check(game.pending_result.time <= 58.1 and int(game.pending_result.winner) in [0, 1], "full runtime simulation produces a finite valid result")
@@ -141,6 +147,7 @@ func run() -> void:
 
 
 func wind_and_snap() -> void:
+	game.launch_button.grab_focus()
 	await key(KEY_SPACE, true)
 	check(game.holding and game.launch_phase == 1, "SPACE begins wind phase")
 	game._process(1.35)

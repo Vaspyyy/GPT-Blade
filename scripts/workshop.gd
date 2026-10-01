@@ -306,6 +306,11 @@ func _build_career() -> void:
 			if index == profile.rung:
 				details.add_child(_wrapped(str(rival.advice), 13, U.CYAN))
 			row.add_child(U.label("+" + str(rival.reward) + " CR", 15, U.GOLD))
+			if index < profile.rung:
+				var rematch := _compact_button("REMATCH", func(): battle_requested.emit(rival.duplicate(true), true))
+				rematch.tooltip_text = "Practice this defeated rival in their original arena. No cost, no rewards, no ladder progress."
+				rematch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+				row.add_child(rematch)
 
 func _build_lab() -> void:
 	content.add_child(U.label("THE EXPERIMENT LAB", 30, Color.WHITE))

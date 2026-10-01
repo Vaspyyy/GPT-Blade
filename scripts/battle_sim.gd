@@ -48,8 +48,8 @@ func setup(player_loadout: Dictionary, opponent_loadout: Dictionary, launch: Dic
 		var direction := Vector2.from_angle(angle) if actor == 0 else Vector2(-0.86, 0.5).normalized()
 		var launch_speed := (0.72 + (power if actor == 0 else 0.78) * 0.7) * (0.66 + quality * 0.34)
 		tops.append({"pos": pos, "vel": direction * launch_speed, "spin": 62.0 + quality * 34.0,
-			"hp": 83.0 + float(stats.burst) * 0.17, "energy": 18.0, "rotation": float(actor) * PI,
-			"stats": stats, "color": stats.color, "name": stats.name, "blade": str(loadout.get("blade", "comet")), "ability": stats.ability, "active": true,
+			"hp": clampf(68.0 + float(stats.burst) * 0.17 + quality * 20.0, 0.0, 100.0), "energy": 18.0, "rotation": float(actor) * PI,
+			"stats": stats, "color": stats.color, "name": stats.name, "blade": str(loadout.get("blade", "comet")), "loadout": loadout.duplicate(), "ability": stats.ability, "active": true,
 			"tilt": top_tilt, "launch_angle": angle if actor == 0 else PI, "quality": quality,
 			"mass": 0.68 + float(stats.weight) * 0.011, "shield_until": -1.0, "boost_until": -1.0,
 			"vortex_until": -1.0, "charge_until": -1.0, "charging": false, "aim": Vector2.ZERO,

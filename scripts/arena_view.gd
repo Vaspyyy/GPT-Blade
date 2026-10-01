@@ -204,15 +204,32 @@ func _draw_top(actor: int, top: Dictionary) -> void:
 			draw_line(p, tip, Color(col, 0.45 + 0.2 * sin(clock * 14)), 2, true)
 			TopView.ellipse(self, p, Vector2(radius * 1.8, radius * 1.1), Color(col, 0.15), false, 2)
 		var top_color: Color = top.get("color", col)
-		TopView.paint(self, p, radius, top_color, float(top.get("rotation", clock * 20)), str(top.get("blade", top.get("name", ""))), float(top.get("energy", 0)))
+		TopView.paint(self, p, radius, top_color, float(top.get("rotation", clock * 20)), str(top.get("blade", top.get("name", ""))), float(top.get("energy", 0)), 0.68, top.get("loadout", {}))
 		if float(top.get("energy", 0)) > 82:
 			for j in range(3):
 				var ang = clock * 3 + j * TAU / 3
 				var ray = p + Vector2(cos(ang), sin(ang) * 0.62) * radius * 1.5
 				draw_line(ray, ray + Vector2(0, -20 - sin(clock * 5) * 7), Color(col, 0.5), 2, true)
 	else:
-		TopView.ellipse(self, p + Vector2(0, 8), Vector2(radius, radius * 0.62), Color(col, 0.14))
-		TopView.paint(self, p, radius * 0.9, top.get("color", col).darkened(0.4), float(top.get("rotation", 0)), "", 0)
+		var finish_age = 0.0
+		for ev in effects:
+			if str(ev.get("type", "")) == "finish": finish_age = float(ev.age)
+		if str(sim.result.get("reason", "")) == "Burst finish":
+			var spread = minf(1.0, finish_age) * radius * 1.4
+			TopView.ellipse(self, p + Vector2(0, 12), Vector2(radius * 0.67, radius * 0.36), Color("62728b"))
+			TopView.ellipse(self, p + Vector2(0, 12), Vector2(radius * 0.39, radius * 0.21), Color("162035"))
+			for j in range(4):
+				var a = j * TAU / 4 + 0.4
+				var q = p + Vector2(cos(a), sin(a) * 0.61) * spread
+				var fragment = PackedVector2Array([q + Vector2(-12, -4), q + Vector2(5, -9), q + Vector2(18, 3), q + Vector2(-5, 7)])
+				draw_colored_polygon(fragment, top.get("color", col).darkened(0.2))
+		elif str(sim.result.get("reason", "")) == "Ring out":
+			p += Vector2(top.pos.x, top.pos.y * 0.61).normalized() * finish_age * radius * 0.32
+			p.y -= sin(minf(1, finish_age) * PI) * radius * 0.22
+			TopView.paint(self, p, radius * maxf(0.3, 1 - finish_age * 0.25), top.get("color", col), float(top.get("rotation", 0)) + finish_age * 9, str(top.get("blade", "")))
+		else:
+			TopView.ellipse(self, p + Vector2(0, 8), Vector2(radius, radius * 0.62), Color(col, 0.14))
+			TopView.paint(self, p, radius * 0.9, top.get("color", col).darkened(0.4), float(top.get("rotation", 0)), str(top.get("blade", "")), 0)
 	# Position markers retain identity even if both builds share a blade color.
 	var marker = p + Vector2(0, -radius * 0.9 - 16)
 	draw_colored_polygon(PackedVector2Array([marker + Vector2(-4, -4), marker + Vector2(4, -4), marker + Vector2(0, 2)]), col)

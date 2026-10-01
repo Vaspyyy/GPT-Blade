@@ -44,6 +44,13 @@ func _run() -> void:
 		for p in Cat.parts(category):
 			check(Cat.part(p.id).category == category, "Catalog round trip")
 	check(Cat.arenas().size() == 4, "Four distinct arenas")
+	var weak_lock = Sim.new()
+	var clean_lock = Sim.new()
+	weak_lock.setup(builds.balanced, builds.guard, {"quality": 0.25}, Cat.arenas()[0])
+	clean_lock.setup(builds.balanced, builds.guard, {"quality": 0.96}, Cat.arenas()[0])
+	check(float(clean_lock.tops[0].hp) > float(weak_lock.tops[0].hp) + 10.0, "A precise launch starts with a stronger burst lock")
+	check(float(clean_lock.tops[0].hp) <= 100.0 and float(weak_lock.tops[0].hp) >= 0.0, "Launch lock bonus stays bounded")
+	check(clean_lock.tops[1].hp == weak_lock.tops[1].hp, "Player timing does not alter the rival's lock")
 	var first = run_match(builds.balanced, builds.guard, 0.88, 33)
 	var replay = run_match(builds.balanced, builds.guard, 0.88, 33)
 	check(first.result == replay.result, "Same inputs produce exactly the same result")

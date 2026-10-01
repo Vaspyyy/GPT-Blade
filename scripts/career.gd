@@ -47,12 +47,12 @@ func _defaults() -> void:
 func rivals() -> Array[Dictionary]:
 	return [
 		_rival("mika", "MIKA SPARK", "The neighborhood comet", "A clean launch. An honest clash. That's all we need.", ["comet", "halo", "rush", "nova"], "skyline", 150, 0, Color("ffb56b"), "Start with timing. A well-centered launch keeps your spin and burst lock healthy."),
-		_rival("rook", "ROOK IRON", "The immovable wall", "Try harder. The floor is still mine.", ["bastion", "anvil", "anchor", "aegis"], "skyline", 180, 0, Color("9cafc4"), "Rook plants in the center. Orbit around the wall with Lotus + Needle, or strike hard with Fang + Rush."),
-		_rival("iona", "IONA WISP", "The quiet survivor", "You can have the sparks. I'll keep the last rotation.", ["lotus", "feather", "needle", "nova"], "skyline", 220, 0, Color("bcb5ff"), "Iona lasts forever if left alone. Fang + Rush hunts her before the late spin duel."),
+		_rival("rook", "ROOK IRON", "The immovable wall", "Try harder. The floor is still mine.", ["bastion", "anvil", "anchor", "aegis"], "skyline", 180, 0, Color("9cafc4"), "Rook plants in the center. Let Lotus + Needle outlast the wall, or strike hard with Fang + Rush."),
+		_rival("iona", "IONA WISP", "The quiet survivor", "You can have the sparks. I'll keep the last rotation.", ["lotus", "feather", "needle", "nova"], "skyline", 220, 0, Color("bcb5ff"), "Iona rewards endurance. Match her with Lotus + Needle and a precise launch, or hunt an early burst with Fang + Rush."),
 		_rival("jax", "JAX RICOCHET", "Rail-riding trouble", "Walls aren't boundaries. They're launchpads.", ["talon", "split", "rebound", "thunder"], "skyline", 210, 1, Color("ff785d"), "Jax charges from the rails. Weight and defense blunt those impacts; a stable tilt prevents ring outs."),
 		_rival("sera", "SERA TIDE", "Dancer of the outer ring", "Catch me before the music ends.", ["mirror", "gyre", "orbit", "vortex"], "glacier", 230, 1, Color("67e0cf"), "Sera keeps distance. A fast hunter closes the gap, while a stamina build can win the empty seconds."),
 		_rival("nox", "NOX REVERSAL", "The patient counter", "The hit you remember will be your own.", ["bastion", "keel", "counter", "aegis"], "volcano", 270, 1, Color("8298ff"), "Nox punishes reckless contact. Orbit and stamina let you save energy, then meet him late."),
-		_rival("emi", "EMI FIREBIRD", "The comeback kid", "Count me out. I dare you.", ["meteor", "reactor", "surge", "phoenix"], "volcano", 260, 2, Color("ff905b"), "Emi's Phoenix shines when spin runs low. Secure a burst or ring out before the comeback window."),
+		_rival("emi", "EMI FIREBIRD", "The comeback kid", "Count me out. I dare you.", ["meteor", "reactor", "surge", "phoenix"], "volcano", 260, 2, Color("ff905b"), "Emi punishes light burst locks. Anvil + Aegis blunts her rushes; secure a burst before Phoenix's comeback window."),
 		_rival("vale", "VALE NULL", "Keeper of the eclipse", "Every spotlight casts a shadow.", ["scythe", "split", "drift", "eclipse"], "stormwell", 290, 2, Color("ce94ff"), "Vale circles and steals momentum. Defense protects burst lock; center control avoids dangerous outer clashes."),
 		_rival("kira", "KIRA VOLT", "One hundred storms", "Let's make enough noise to wake the sky.", ["fang", "reactor", "surge", "thunder"], "volcano", 330, 2, Color("ffe274"), "Kira commits to violent rushes. Anchor + Anvil can absorb them; Counter turns that aggression against her."),
 		_rival("orin", "ORIN MERIDIAN", "The flawless orbit", "There is a place for every star. Find yours.", ["leviathan", "gyre", "gyro", "vortex"], "glacier", 320, 3, Color("73d9ef"), "Orin's spin economy is exceptional. A decisive attack build needs a powerful launch and early contact."),
@@ -140,6 +140,10 @@ func recall_build(slot: int) -> bool:
 
 func record_match(result: Dictionary, practice: bool) -> Dictionary:
 	var opponent := current_rival()
+	if result.get("rival_name") is String:
+		opponent.name = str(result.rival_name).left(100)
+	if result.get("rival_advice") is String:
+		opponent.advice = str(result.rival_advice).left(500)
 	var won: bool = int(result.get("winner", 1)) == 0
 	var old_tier := unlocked_tier()
 	var reward := 0

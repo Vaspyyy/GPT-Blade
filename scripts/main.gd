@@ -58,8 +58,14 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		if profile != null: profile.save_profile()
-		get_tree().quit()
+		_request_quit()
+
+func _request_quit() -> void:
+	if profile != null: profile.save_profile()
+	if sound != null: sound.stop()
+	set_process(false)
+	await get_tree().create_timer(0.15).timeout
+	get_tree().quit()
 
 func _on_resize() -> void:
 	if is_instance_valid(gauge): gauge.queue_redraw()
@@ -142,7 +148,7 @@ func _show_title() -> void:
 	buttons.add_child(UI.button("HOW TO PLAY", _show_help))
 	var little = UI.hbox(left, 18)
 	little.add_child(UI.button("OPTIONS", func(): _show_settings("title")))
-	little.add_child(UI.button("QUIT", func(): get_tree().quit()))
+	little.add_child(UI.button("QUIT", _request_quit))
 	var hero_box = UI.vbox(row, 8)
 	hero_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var top_view = TopView.new()
@@ -209,10 +215,10 @@ func _show_launch() -> void:
 	side.add_child(UI.label(str(rival.name), 37, UI.WHITE))
 	side.add_child(UI.label(str(rival.title), 17, UI.GOLD))
 	side.add_child(UI.paragraph('“' + str(rival.quote) + '”', 16, UI.MUTED))
-	var rival_top = TopView.new()
-	rival_top.custom_minimum_size = Vector2(310, 155)
-	rival_top.set_loadout(rival.loadout)
-	side.add_child(rival_top)
+	var portrait = RivalPortrait.new()
+	portrait.custom_minimum_size = Vector2(310, 180)
+	portrait.initialize(rival)
+	side.add_child(portrait)
 	var their_stats = Catalog.stats(rival.loadout)
 	side.add_child(UI.label(str(their_stats.behavior).to_upper() + "  /  " + str(their_stats.ability).to_upper(), 17, UI.PINK))
 	side.add_child(UI.paragraph(str(rival.get("advice", "Watch the paths. Every driver fights differently.")), 14))
@@ -242,7 +248,7 @@ func _show_launch() -> void:
 	angle_slider.value_changed.connect(func(v): launch_angle = deg_to_rad(v))
 	var tilt_box = UI.vbox(sliders, 5)
 	tilt_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	tilt_box.add_child(UI.label("TILT: STABLE ↔ AGGRESSIVE   ↑ / ↓", 14, UI.GOLD))
+	tilt_box.add_child(UI.label("TILT: STABLE / AGGRESSIVE   ↑ / ↓", 14, UI.GOLD))
 	tilt_slider = HSlider.new()
 	tilt_slider.min_value = 0
 	tilt_slider.max_value = 1
@@ -274,6 +280,8 @@ func _wind_start() -> void:
 	holding = true
 	launch_phase = 1
 	phase_clock = 0
+	angle_slider.editable = false
+	tilt_slider.editable = false
 	sound.play("charge")
 
 func _wind_release() -> void:
@@ -361,6 +369,10 @@ func _start_battle(quality_override: float = -1.0) -> void:
 		var hp_bar = _bar(row, UI.GOLD)
 		row.add_child(UI.label("SPIRIT", 12, UI.MUTED))
 		var energy_bar = _bar(row, Color("bca4ff"))
+		spin_bar.value = match_sim.tops[i].spin
+		spin_value.text = str(roundi(match_sim.tops[i].spin))
+		hp_bar.value = match_sim.tops[i].hp
+		energy_bar.value = match_sim.tops[i].energy
 		hud.append({"spin": spin_bar, "hp": hp_bar, "energy": energy_bar, "value": spin_value})
 	arena_view = ArenaView.new()
 	arena_view.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -526,6 +538,8 @@ func _toggle_pause() -> void:
 
 func _show_results() -> void:
 	pending_result = match_sim.result.duplicate(true)
+	pending_result.rival_name = str(rival.name)
+	pending_result.rival_advice = str(rival.get("advice", ""))
 	var report = profile.record_match(pending_result, practice)
 	_new_page("results")
 	_bg()
@@ -647,10 +661,39 @@ func _show_settings(back: String) -> void:
 			profile.settings[key] = v
 			if key == "fullscreen": DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if v else DisplayServer.WINDOW_MODE_WINDOWED))
 	card.add_child(UI.paragraph("Window resizing keeps the arena and controls together. F11 toggles fullscreen anywhere. Career progress is stored locally in your user data folder.", 15))
+	card.add_child(UI.button("START A NEW CAREER…", func(): _confirm_reset(card)))
 	card.add_child(UI.button("SAVE & RETURN", func():
 		profile.save_profile()
 		if back == "workshop": _show_workshop()
 		else: _show_title(), true))
+
+func _confirm_reset(parent: Node) -> void:
+	if parent.has_node("ResetPrompt"): return
+	var box = PanelContainer.new()
+	box.name = "ResetPrompt"
+	box.add_theme_stylebox_override("panel", UI.panel(Color("23172b"), UI.PINK))
+	parent.add_child(box)
+	var stack = UI.vbox(box, 9)
+	stack.add_child(UI.paragraph("Start from the underpass again? This resets your career, credits, parts, and saved builds. Your settings stay as they are.", 15, UI.WHITE))
+	var row = UI.hbox(stack)
+	row.add_child(UI.button("KEEP MY CAREER", func(): box.queue_free(), true))
+	row.add_child(UI.button("RESET CAREER", func():
+		var prefs = profile.settings.duplicate()
+		profile.reset_profile()
+		profile.settings = prefs
+		profile.save_profile()
+		_show_workshop()))
+
+func _input(event: InputEvent) -> void:
+	# Gameplay bindings take precedence over a focused button's ui_accept event.
+	# Handle both edges so one press cannot wind/launch and click a menu button.
+	if not event is InputEventKey or event.echo: return
+	if event.keycode == KEY_SPACE and screen in ["launch", "battle"]:
+		_unhandled_key_input(event)
+		get_viewport().set_input_as_handled()
+	elif event.pressed and event.keycode in [KEY_ESCAPE, KEY_F11]:
+		_unhandled_key_input(event)
+		get_viewport().set_input_as_handled()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or event.echo: return
