@@ -27,15 +27,20 @@ Debug::NoLocking "true";
 APT::Sandbox::User "$(id -un)";
 EOF
 APT_CONFIG="$apt_dir/apt.conf" /usr/bin/apt-get update
-APT_CONFIG="$apt_dir/apt.conf" /usr/bin/apt-get --download-only -y --no-install-recommends install \
-    sway grim wtype xvfb xdotool wlrctl libwayland-dev libwayland-bin
+packages=(sway grim xvfb xdotool libwayland-dev libwayland-bin libxkbcommon-dev)
+if [[ "${PLATFORM_TEST_KWIN:-0}" == 1 ]]; then packages+=(kwin-wayland); fi
+APT_CONFIG="$apt_dir/apt.conf" /usr/bin/apt-get --download-only -y --no-install-recommends install "${packages[@]}"
 for package in "$apt_dir/archives/"*.deb; do dpkg-deb -x "$package" "$sysroot"; done
 
 protocol_url=https://raw.githubusercontent.com/swaywm/wlr-protocols/b010a03648b88d143236de193bddbfea0c08bc84/unstable/wlr-virtual-pointer-unstable-v1.xml
 curl --fail --location --show-error --max-time 60 "$protocol_url" -o "$tooling_dir/wlr-virtual-pointer-unstable-v1.xml"
 "$sysroot/usr/bin/wayland-scanner" client-header "$tooling_dir/wlr-virtual-pointer-unstable-v1.xml" "$tooling_dir/wlr-virtual-pointer.h"
 "$sysroot/usr/bin/wayland-scanner" private-code "$tooling_dir/wlr-virtual-pointer-unstable-v1.xml" "$tooling_dir/wlr-virtual-pointer.c"
+keyboard_url=https://raw.githubusercontent.com/swaywm/wlroots/0855cdacb2eeeff35849e2e9c4db0aa996d78d10/protocol/virtual-keyboard-unstable-v1.xml
+curl --fail --location --show-error --max-time 60 "$keyboard_url" -o "$tooling_dir/virtual-keyboard-unstable-v1.xml"
+"$sysroot/usr/bin/wayland-scanner" client-header "$tooling_dir/virtual-keyboard-unstable-v1.xml" "$tooling_dir/virtual-keyboard.h"
+"$sysroot/usr/bin/wayland-scanner" private-code "$tooling_dir/virtual-keyboard-unstable-v1.xml" "$tooling_dir/virtual-keyboard.c"
 gcc -Wall -Wextra -I"$tooling_dir" -I"$sysroot/usr/include" \
-    "$project_dir/tools/platform_pointer.c" "$tooling_dir/wlr-virtual-pointer.c" \
-    -l:libwayland-client.so.0 -o "$tooling_dir/platform-pointer"
+    "$project_dir/tools/platform_pointer.c" "$tooling_dir/wlr-virtual-pointer.c" "$tooling_dir/virtual-keyboard.c" \
+    -l:libwayland-client.so.0 -l:libxkbcommon.so.0 -o "$tooling_dir/platform-pointer"
 printf 'Native Wayland test tools ready in %s\n' "$tooling_dir"

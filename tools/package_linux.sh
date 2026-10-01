@@ -44,6 +44,13 @@ cp docs/APACHE-2.0.txt "$staging/"
 if [[ -f LICENSE ]]; then cp LICENSE "$staging/LICENSE"; fi
 if [[ -f README.md ]]; then cp README.md "$staging/README.md"; fi
 if [[ -f docs/PLAYTESTS.md ]]; then cp docs/PLAYTESTS.md "$staging/PLAYTESTS.md"; fi
+if [[ -f docs/BALANCE.md ]]; then cp docs/BALANCE.md "$staging/BALANCE.md"; fi
+mkdir -p "$staging/docs"
+for document in LINUX PLAYTESTS BALANCE PLATFORM-TESTING; do
+    if [[ -f "docs/$document.md" ]]; then cp "docs/$document.md" "$staging/docs/"; fi
+done
+if [[ -d docs/screenshots ]]; then cp -R docs/screenshots "$staging/docs/"; fi
+if [[ -f UPDATES.md ]]; then cp UPDATES.md "$staging/UPDATES.md"; fi
 
 file "$staging/spin-ascend.x86_64"
 "$staging/spin-ascend.x86_64" --headless --version

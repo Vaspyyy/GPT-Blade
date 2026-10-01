@@ -561,7 +561,10 @@ func _show_results() -> void:
 	top.custom_minimum_size = Vector2(370, 290)
 	top.set_loadout(profile.loadout)
 	left.add_child(top)
-	if report.ending:
+	if practice:
+		left.add_child(UI.label("PRACTICE COMPLETE / IDEA TESTED", 22, UI.GOLD))
+		left.add_child(UI.paragraph("Your ladder, record, and credits stay unchanged. Save what worked, change one part, and try another launch.", 16))
+	elif report.ending:
 		left.add_child(UI.paragraph("From the underpass to the skyline. Every part, every launch, every comeback was yours. The crown is only the beginning: legend rematches await.", 19, UI.GOLD))
 	elif report.promoted:
 		left.add_child(UI.label("PROMOTED / " + str(report.league), 25, UI.GOLD))

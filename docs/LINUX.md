@@ -48,4 +48,4 @@ Run `tools/platform_check.sh /path/to/spin-ascend.x86_64 --smoke` for host diagn
 
 ## Verification scope
 
-The bundled `PLAYTESTS.md` (or `docs/PLAYTESTS.md` in the repository) distinguishes observed Linux/Wayland results from platform assumptions. The development cloud has no KDE Plasma installation or physical GPU. Native Wayland was verified on a headless Sway compositor, including rendered screenshots and keyboard/mouse input. This does not establish that KDE-specific scaling, window decorations, or every graphics driver has been tested.
+The bundled `PLAYTESTS.md` (or `docs/PLAYTESTS.md` in the repository) distinguishes observed Linux/Wayland results from platform assumptions. Native Wayland was verified on Sway and the actual KDE KWin 6.3.6 compositor, including rendered screenshots, keyboard/mouse input, window decorations, and fullscreen. The cloud has no complete Plasma desktop shell or physical GPU. KDE fractional scaling and individual hardware graphics drivers remain untested.

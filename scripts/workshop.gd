@@ -478,6 +478,11 @@ func _wrapped(value: String, size: int = 15, color: Color = Color.WHITE) -> Labe
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
+	if event.keycode not in [KEY_B, KEY_C, KEY_L, KEY_ENTER, KEY_KP_ENTER, KEY_P, KEY_1, KEY_2, KEY_3, KEY_4]:
+		return
+	# Match signals remove this workshop from the scene tree synchronously.
+	# Consume the event while our viewport still exists, before that transition.
+	get_viewport().set_input_as_handled()
 	match event.keycode:
 		KEY_B: _select_tab("BUILD")
 		KEY_C: _select_tab("CAREER")
@@ -490,4 +495,3 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			comparison = ""
 			_rebuild()
 		_: return
-	get_viewport().set_input_as_handled()

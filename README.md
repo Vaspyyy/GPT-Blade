@@ -4,6 +4,8 @@
 
 Download the runnable game from [GitHub Releases](https://github.com/Vaspyyy/GPT-Blade/releases). No Godot installation is needed to play. The launcher uses native Wayland in a KDE Plasma Wayland session.
 
+![SPIN//ASCEND running natively through KDE's KWin compositor](docs/screenshots/title.png)
+
 ```sh
 tar -xzf spin-ascend-1.0.0-linux-x86_64.tar.gz
 cd spin-ascend-1.0.0-linux-x86_64
@@ -54,3 +56,7 @@ On a sandboxed host without a writable home directory, set `XDG_DATA_HOME`, `XDG
 [Playtest evidence and limits](docs/PLAYTESTS.md), [balance findings](docs/BALANCE.md), and [development updates](UPDATES.md) record what was observed and what should improve next.
 
 Code, original vector art, and synthesized audio are MIT licensed. Open Sans fonts use Apache 2.0; Godot and its dependencies have the notices bundled in the Linux package.
+
+![Workshop and part comparisons](docs/screenshots/workshop.png)
+![Rival briefing and two-stage launch](docs/screenshots/launch.png)
+![Automatic spirit attacks in an actual native Linux match](docs/screenshots/battle.png)
