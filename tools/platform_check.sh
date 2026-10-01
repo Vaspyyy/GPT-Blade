@@ -2,6 +2,10 @@
 # Read-only host diagnostics; optional smoke test uses the actual release.
 set -euo pipefail
 project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ "$project_dir" == /workspace/* ]]; then
+    export XDG_CACHE_HOME="${XDG_CACHE_HOME:-/workspace/tooling/cache}"
+    mkdir -p "$XDG_CACHE_HOME"
+fi
 game="${1:-$project_dir/build/spin-ascend-1.0.0-linux-x86_64/spin-ascend.x86_64}"
 printf 'Architecture: %s\n' "$(uname -m)"
 if [[ -r /etc/os-release ]]; then
