@@ -8,7 +8,8 @@ var exploded: bool = false
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	custom_minimum_size = Vector2(200, 200)
+	if custom_minimum_size == Vector2.ZERO:
+		custom_minimum_size = Vector2(200, 200)
 
 func set_loadout(value: Dictionary) -> void:
 	loadout = value.duplicate()
