@@ -4,6 +4,8 @@
 
 Download the runnable game from [GitHub Releases](https://github.com/Vaspyyy/GPT-Blade/releases). No Godot installation is needed to play. The launcher uses native Wayland in a KDE Plasma Wayland session.
 
+[Download Linux x86_64 1.0.0](https://github.com/Vaspyyy/GPT-Blade/raw/refs/tags/v1.0.0/release/spin-ascend-1.0.0-linux-x86_64.tar.gz). The release links the verified archive in its Git tag because GitHub's asset upload endpoint rejected uploads.
+
 ![SPIN//ASCEND running natively through KDE's KWin compositor](docs/screenshots/title.png)
 
 ```sh

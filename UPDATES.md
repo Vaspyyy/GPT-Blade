@@ -31,3 +31,7 @@ Release testing exposed an Enter/P transition bug: Workshop accessed its viewpor
 Reusable installation/start instructions are saved in the cloud environment draft. The Linux package includes standalone executable, Wayland launcher, instructions, playtest/balance notes, and license notices. Final source/artifacts and exact checksums are being published as v1.0.0.
 
 The platform diagnostic now uses a writable font cache in the cloud workspace. This keeps the native host check usable when the home directory is read-only; the frozen release executable is unchanged.
+
+## 2026-10-01 — Linux delivery
+
+GitHub's release asset upload endpoint repeatedly rejected even a 205-byte checksum file with HTTP 400 "Bad Content-Length". Delivery uses Git instead: the exact verified Linux TAR archive and its checksum are committed under `release/` and linked directly from v1.0.0. The game binary is unchanged; no further upload retries are needed. Full native playtest findings and remaining platform limits remain in `docs/PLAYTESTS.md`.
